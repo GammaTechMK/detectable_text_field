@@ -41,6 +41,7 @@ class DetectableText extends StatefulWidget {
     this.trimMode = TrimMode.Length,
     this.delimiter = _kEllipsis + ' ',
     this.callback,
+    this.selectable = false,
   });
 
   final String text;
@@ -50,6 +51,7 @@ class DetectableText extends StatefulWidget {
   final TextAlign textAlign;
   final TextDirection? textDirection;
   final bool softWrap;
+  final bool selectable;
   final TextOverflow overflow;
   final TextScaler textScaler;
   final int? maxLines;
@@ -171,9 +173,7 @@ class _DetectableTextState extends State<DetectableText> {
         if (linkSize.width < maxWidth) {
           final readMoreSize = linkSize.width + delimiterSize.width;
           final pos = textPainter.getPositionForOffset(Offset(
-            textDirection == TextDirection.rtl
-                ? readMoreSize
-                : textSize.width - readMoreSize,
+            textDirection == TextDirection.rtl ? readMoreSize : textSize.width - readMoreSize,
             textSize.height,
           ));
           endIndex = textPainter.getOffsetBefore(pos.offset) ?? 0;
@@ -252,20 +252,25 @@ class _DetectableTextState extends State<DetectableText> {
 
             break;
           default:
-            throw Exception(
-                'TrimMode type: ${widget.trimMode} is not supported');
+            throw Exception('TrimMode type: ${widget.trimMode} is not supported');
         }
 
-        // return RichText(
-        //   textAlign: textAlign,
-        //   textDirection: textDirection,
-        //   softWrap: true,
-        //   //softWrap,
-        //   overflow: TextOverflow.clip,
-        //   //overflow,
-        //   textScaleFactor: textScaleFactor,
-        //   text: textSpan,
-        // );
+        if (widget.selectable)
+          return SelectionArea(
+            child: Text.rich(
+              textSpan,
+              textAlign: widget.textAlign,
+              textDirection: textDirection,
+              softWrap: widget.softWrap,
+              overflow: widget.overflow,
+              textScaler: widget.textScaler,
+              maxLines: widget.maxLines,
+              locale: widget.locale,
+              strutStyle: widget.strutStyle,
+              textWidthBasis: widget.textWidthBasis,
+              textHeightBehavior: widget.textHeightBehavior,
+            ),
+          );
 
         return RichText(
           text: textSpan,
@@ -284,25 +289,5 @@ class _DetectableTextState extends State<DetectableText> {
     );
 
     return result;
-
-    // return RichText(
-    //   text: getDetectedTextSpan(
-    //     decoratedStyle: dStyle,
-    //     basicStyle: style,
-    //     onTap: widget.onTap,
-    //     source: widget.text,
-    //     detectionRegExp: widget.detectionRegExp,
-    //   ),
-    //   textAlign: widget.textAlign,
-    //   textDirection: widget.textDirection,
-    //   softWrap: widget.softWrap,
-    //   overflow: widget.overflow,
-    //   textScaleFactor: widget.textScaleFactor,
-    //   maxLines: widget.maxLines,
-    //   locale: widget.locale,
-    //   strutStyle: widget.strutStyle,
-    //   textWidthBasis: widget.textWidthBasis,
-    //   textHeightBehavior: widget.textHeightBehavior,
-    // );
   }
 }
